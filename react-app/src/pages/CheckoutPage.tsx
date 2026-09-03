@@ -57,6 +57,14 @@ export default function CheckoutPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+
+    // Must be logged in to place an order
+    const token = getToken();
+    if (!token || !user) {
+      setError('You must be logged in to place an order. Please log in via My Account first.');
+      return;
+    }
+
     setLoading(true);
 
     // Build the address object the backend expects
@@ -74,29 +82,30 @@ export default function CheckoutPage() {
     };
 
     try {
-      // First ensure we have a cart on the backend — add items if needed.
-      // The backend cart is session-based via user auth; get the token.
-      const token = localStorage.getItem('scminer_access_token') ?? '';
+      const authHeaders = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      };
 
-      // Sync cart items to backend
+      // Sync cart items to backend cart (authenticated — lands in user's cart)
       for (const { product, qty } of items) {
-        await fetch(`${API_BASE}/api/v1/cart/items`, {
+        const cartRes = await fetch(`${API_BASE}/api/v1/cart/items`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
+          headers: authHeaders,
           body: JSON.stringify({ productId: product.id, quantity: qty }),
         });
+        if (!cartRes.ok) {
+          const d = await cartRes.json() as Record<string, unknown>;
+          const msg = (d['error'] as Record<string, unknown>)?.['message'] as string ?? 'Failed to sync cart';
+          setError(msg);
+          return;
+        }
       }
 
       // Place order
       const res = await fetch(`${API_BASE}/api/v1/orders`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        headers: authHeaders,
         body: JSON.stringify({
           billingAddress,
           shippingAddress:  billingAddress,
@@ -115,7 +124,6 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Save token returned (if register/login happened inline)
       setOrderNumber(String(data['orderNumber'] ?? ''));
       clear();
       setDone(true);
