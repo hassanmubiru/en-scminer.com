@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuthCtx } from '../context/AuthContext';
 import { API_BASE } from '../lib/api';
 import './CheckoutPage.css';
 
