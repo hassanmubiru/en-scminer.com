@@ -146,6 +146,21 @@ export default function CheckoutPage() {
     );
   }
 
+  // Must be logged in — show prompt if not authenticated
+  if (!authLoading && !user && !done) {
+    return (
+      <div className="container" style={{ padding: '80px 20px', textAlign: 'center' }}>
+        <h2>Login Required</h2>
+        <p style={{ marginTop: 12, marginBottom: 24, color: 'var(--text)' }}>
+          You need to be logged in to place an order.
+        </p>
+        <Link to="/my-account" className="btn btn-primary" style={{ display: 'inline-flex' }}>
+          Login or Register
+        </Link>
+      </div>
+    );
+  }
+
   if (done) {
     return (
       <div className="order-done">
