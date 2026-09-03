@@ -41,6 +41,7 @@ const DEFAULT_SHIPPING_METHOD_ID = '4b92783d-fb56-4794-a73f-f3dadb24159e';
 
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
+  const { user, loading: authLoading, getToken } = useAuthCtx();
   const navigate = useNavigate();
   const [form, setForm] = useState<OrderForm>(INITIAL);
   const [loading, setLoading] = useState(false);
