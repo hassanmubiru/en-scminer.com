@@ -14,11 +14,13 @@ const client = createStreetClient({ baseUrl: 'http://localhost:3001' });
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <StreetProvider client={client}>
-      <CartProvider>
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <App />
-        </BrowserRouter>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <App />
+          </BrowserRouter>
+        </CartProvider>
+      </AuthProvider>
     </StreetProvider>
   </StrictMode>,
 );
