@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useMutation } from '@streetjs/react';
 import { useCart } from '../context/CartContext';
+import { API_BASE } from '../lib/api';
 import './CheckoutPage.css';
 
 interface OrderForm {
@@ -21,24 +21,31 @@ const INITIAL: OrderForm = {
 };
 
 const PAYMENT_METHODS = [
-  { id: 'wire',  label: 'Bank Wire / SWIFT', desc: 'International bank transfer in USD.' },
-  { id: 'btc',   label: 'Bitcoin (BTC)',       desc: 'Pay with Bitcoin to our wallet address.' },
-  { id: 'usdt',  label: 'USDT (ERC20/TRC20)', desc: 'Tether stablecoin on Ethereum or TRON.' },
-  { id: 'eth',   label: 'Ethereum (ETH)',      desc: 'Pay with ETH to our wallet address.' },
+  { id: 'wire',  label: 'Bank Wire / SWIFT',   desc: 'International bank transfer in USD.' },
+  { id: 'btc',   label: 'Bitcoin (BTC)',        desc: 'Pay with Bitcoin to our wallet address.' },
+  { id: 'usdt',  label: 'USDT (ERC20/TRC20)',  desc: 'Tether stablecoin on Ethereum or TRON.' },
+  { id: 'eth',   label: 'Ethereum (ETH)',       desc: 'Pay with ETH to our wallet address.' },
 ];
+
+// Map frontend payment ids to backend enum values
+const PAYMENT_METHOD_MAP: Record<string, string> = {
+  wire:  'BANK_WIRE',
+  btc:   'BTC',
+  usdt:  'USDT_ERC20',
+  eth:   'ETH',
+};
+
+// Default shipping method ID (Standard Shipping — free over $10k)
+const DEFAULT_SHIPPING_METHOD_ID = '4b92783d-fb56-4794-a73f-f3dadb24159e';
 
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const navigate = useNavigate();
   const [form, setForm] = useState<OrderForm>(INITIAL);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [done, setDone] = useState(false);
-
-  // useMutation from @streetjs/react wraps the async order submission
-  const { mutate: placeOrder, loading, error } = useMutation(async (data: OrderForm) => {
-    // In production this would POST to your StreetJS backend
-    await new Promise((r) => setTimeout(r, 1200));
-    return { orderId: `SC-${Date.now()}`, ...data };
-  });
+  const [orderNumber, setOrderNumber] = useState('');
 
   function set(field: keyof OrderForm) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -47,10 +54,75 @@ export default function CheckoutPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await placeOrder(form);
-    clear();
-    setDone(true);
-    setTimeout(() => navigate('/'), 4000);
+    setError('');
+    setLoading(true);
+
+    // Build the address object the backend expects
+    const billingAddress = {
+      firstName:   form.firstName,
+      lastName:    form.lastName,
+      company:     form.company || undefined,
+      line1:       form.address1,
+      line2:       form.address2 || undefined,
+      city:        form.city,
+      state:       form.state || undefined,
+      postcode:    form.postcode,
+      countryCode: form.country,
+      phone:       form.phone || undefined,
+    };
+
+    try {
+      // First ensure we have a cart on the backend — add items if needed.
+      // The backend cart is session-based via user auth; get the token.
+      const token = localStorage.getItem('scminer_access_token') ?? '';
+
+      // Sync cart items to backend
+      for (const { product, qty } of items) {
+        await fetch(`${API_BASE}/api/v1/cart/items`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ productId: product.id, quantity: qty }),
+        });
+      }
+
+      // Place order
+      const res = await fetch(`${API_BASE}/api/v1/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          billingAddress,
+          shippingAddress:  billingAddress,
+          shippingMethodId: DEFAULT_SHIPPING_METHOD_ID,
+          paymentMethod:    PAYMENT_METHOD_MAP[form.payment] ?? 'BANK_WIRE',
+          customerNote:     form.notes || undefined,
+        }),
+      });
+
+      const data = await res.json() as Record<string, unknown>;
+
+      if (!res.ok) {
+        const msg = (data['error'] as Record<string, unknown>)?.['message'] as string
+          ?? 'Order failed. Please try again.';
+        setError(msg);
+        return;
+      }
+
+      // Save token returned (if register/login happened inline)
+      setOrderNumber(String(data['orderNumber'] ?? ''));
+      clear();
+      setDone(true);
+      setTimeout(() => navigate('/my-account'), 4000);
+    } catch {
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (items.length === 0 && !done) {
@@ -71,8 +143,9 @@ export default function CheckoutPage() {
           <div className="done-card">
             <span className="done-icon">✅</span>
             <h2>Order Placed Successfully!</h2>
+            {orderNumber && <p className="done-order-num">Order #{orderNumber}</p>}
             <p>Thank you for your order. Our team will contact you within 24 hours with payment details and shipping information.</p>
-            <p className="done-redirect">Redirecting to homepage…</p>
+            <p className="done-redirect">Redirecting to your account…</p>
           </div>
         </div>
       </div>
@@ -237,10 +310,8 @@ export default function CheckoutPage() {
               ))}
             </div>
 
-            {!!error && (
-              <div className="notice notice-error">
-                Failed to place order. Please try again or contact support.
-              </div>
+            {error && (
+              <div className="notice notice-error">{error}</div>
             )}
 
             <button
@@ -249,7 +320,9 @@ export default function CheckoutPage() {
               className="btn btn-primary btn-lg btn-full place-order-btn"
               disabled={loading}
             >
-              {loading ? <><span className="spinner" style={{ borderTopColor: '#fff' }} /> Placing Order…</> : 'Place Order'}
+              {loading
+                ? <><span className="spinner" style={{ borderTopColor: '#fff' }} /> Placing Order…</>
+                : 'Place Order'}
             </button>
 
             <p className="order-note">
