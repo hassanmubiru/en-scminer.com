@@ -15,6 +15,7 @@ import { authenticate } from './middleware/auth.middleware.js';
 // Controllers
 import { HealthController }     from './health.controller.js';
 import { AuthController }       from './auth/auth.controller.js';
+import { AuthAliasController }  from './auth/auth-alias.controller.js';
 import { CategoryController }   from './categories/category.controller.js';
 import { BrandController }      from './brands/brand.controller.js';
 import { ProductController }    from './products/product.controller.js';
@@ -131,6 +132,7 @@ async function bootstrap(): Promise<void> {
   // ── Register controllers ───────────────────────────────────────────────────
   app.registerController(HealthController);
   app.registerController(AuthController);
+  app.registerController(AuthAliasController); // bridges @streetjs/client built-in auth paths
   app.registerController(CategoryController);
   app.registerController(BrandController);
   app.registerController(ProductController);
