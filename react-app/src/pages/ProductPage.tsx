@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import ProductCard from '../components/ProductCard';
-import { getProductBySlug, getRelatedProducts, products } from '../data/products';
+import { fetchProductBySlug, fetchRelatedProducts, type Product } from '../lib/api';
 import './ProductPage.css';
 
 type Tab = 'description' | 'reviews' | 'shipping';
@@ -12,15 +12,49 @@ export default function ProductPage() {
   const navigate = useNavigate();
   const { add } = useCart();
 
-  const [qty, setQty]             = useState(1);
-  const [activeTab, setActiveTab] = useState<Tab>('description');
-  const [added, setAdded]         = useState(false);
-  const [activeImg, setActiveImg] = useState(0);
-  const [wishlist, setWishlist]   = useState(false);
+  const [product, setProduct]       = useState<Product | null>(null);
+  const [related, setRelated]       = useState<Product[]>([]);
+  const [loading, setLoading]       = useState(true);
+  const [notFound, setNotFound]     = useState(false);
 
-  const product = getProductBySlug(slug ?? '');
+  const [qty, setQty]               = useState(1);
+  const [activeTab, setActiveTab]   = useState<Tab>('description');
+  const [added, setAdded]           = useState(false);
+  const [activeImg, setActiveImg]   = useState(0);
+  const [wishlist, setWishlist]     = useState(false);
 
-  if (!product) {
+  useEffect(() => {
+    if (!slug) return;
+    let cancelled = false;
+    setLoading(true);
+    setNotFound(false);
+    setActiveImg(0);
+
+    fetchProductBySlug(slug).then((p) => {
+      if (cancelled) return;
+      if (!p) { setNotFound(true); setLoading(false); return; }
+      setProduct(p);
+      setLoading(false);
+      // Fetch related products
+      fetchRelatedProducts(p.id, 4).then((r) => {
+        if (!cancelled) setRelated(r);
+      }).catch(() => {});
+    }).catch(() => {
+      if (!cancelled) { setNotFound(true); setLoading(false); }
+    });
+
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="container" style={{ textAlign: 'center', padding: '80px 0' }}>
+        <div className="loading-state"><span className="spinner" /> Loading product…</div>
+      </div>
+    );
+  }
+
+  if (notFound || !product) {
     return (
       <div className="container" style={{ textAlign: 'center', padding: '80px 0' }}>
         <h2>Product not found</h2>
@@ -32,14 +66,10 @@ export default function ProductPage() {
     );
   }
 
-  // Prev / next products in same category
-  const sameCat  = products.filter((p) => p.categorySlug === product.categorySlug);
-  const myIdx    = sameCat.findIndex((p) => p.id === product.id);
-  const prevProd = myIdx > 0 ? sameCat[myIdx - 1] : null;
-  const nextProd = myIdx < sameCat.length - 1 ? sameCat[myIdx + 1] : null;
-
-  const galleryImgs = [product.image, product.image, product.image];
-  const related     = getRelatedProducts(product, 4);
+  // Build gallery images from API images array or fall back to main image
+  const galleryImgs: string[] = product.images && product.images.length > 0
+    ? product.images.map((img) => img.url)
+    : [product.image, product.image, product.image];
 
   function handleAdd() {
     add(product!, qty);
@@ -51,7 +81,7 @@ export default function ProductPage() {
     navigate('/cart');
   }
 
-  const shareUrl = encodeURIComponent(window.location.href);
+  const shareUrl   = encodeURIComponent(window.location.href);
   const shareTitle = encodeURIComponent(product.name);
 
   return (
@@ -76,21 +106,11 @@ export default function ProductPage() {
         {/* ── LEFT: Gallery ────────────────────────────────────── */}
         <div className="product-gallery">
 
-          {/* Prev / Next navigation above gallery */}
+          {/* Prev / Next navigation */}
           <div className="product-nav-row">
-            {prevProd ? (
-              <Link to={`/product/${prevProd.slug}`} className="prod-nav-btn prod-nav-prev" title={prevProd.name}>
-                ‹
-              </Link>
-            ) : <span className="prod-nav-btn prod-nav-prev disabled">‹</span>}
-
+            <span className="prod-nav-btn prod-nav-prev disabled">‹</span>
             <Link to="/shop" className="prod-nav-back">Back to products</Link>
-
-            {nextProd ? (
-              <Link to={`/product/${nextProd.slug}`} className="prod-nav-btn prod-nav-next" title={nextProd.name}>
-                ›
-              </Link>
-            ) : <span className="prod-nav-btn prod-nav-next disabled">›</span>}
+            <span className="prod-nav-btn prod-nav-next disabled">›</span>
           </div>
 
           {/* Main image */}
@@ -192,9 +212,19 @@ export default function ProductPage() {
               <strong>Category:</strong>{' '}
               <Link to={`/shop?cat=${product.categorySlug}`}>{product.category}</Link>
             </span>
+            {product.brand && (
+              <span className="meta-item">
+                <strong>Brand:</strong> {product.brand}
+              </span>
+            )}
+            {product.algorithm && (
+              <span className="meta-item">
+                <strong>Algorithm:</strong> {product.algorithm}
+              </span>
+            )}
           </div>
 
-          {/* Social share — matches original Facebook/Twitter/Pinterest/LinkedIn/Telegram */}
+          {/* Social share */}
           <div className="product-share">
             <span className="share-label">Share:</span>
             <div className="share-icons">
@@ -233,7 +263,6 @@ export default function ProductPage() {
       <div className="product-tabs-section">
         <div className="container">
 
-          {/* Desktop tab nav */}
           <ul className="tabs-nav" role="tablist">
             {([
               { id: 'description' as Tab, label: 'Description' },
@@ -253,7 +282,6 @@ export default function ProductPage() {
             ))}
           </ul>
 
-          {/* Tab panels */}
           <div className="tab-content">
 
             {activeTab === 'description' && (
@@ -276,6 +304,27 @@ export default function ProductPage() {
                                 <td>{s.value}</td>
                               </tr>
                             ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Show miner technical specs from product data */}
+                  {(product.hashrate || product.power || product.algorithm) && product.specs.length === 0 && (
+                    <>
+                      <h4 style={{ marginTop: 24, marginBottom: 12, color: 'var(--title)' }}>
+                        Technical Specifications
+                      </h4>
+                      <div className="specs-table-wrap">
+                        <table className="specs-table">
+                          <tbody>
+                            {product.brand && <tr><th>Manufacturer</th><td>{product.brand}</td></tr>}
+                            {product.hashrate && <tr><th>Hashrate</th><td>{product.hashrate}</td></tr>}
+                            {product.power && <tr><th>Power Consumption</th><td>{product.power}</td></tr>}
+                            {product.algorithm && <tr><th>Algorithm</th><td>{product.algorithm}</td></tr>}
+                            <tr><th>Delivery Time</th><td>1–2 Working days</td></tr>
+                            <tr><th>Payment Terms</th><td>USD | BTC | USDT (ERC20/TRC20)</td></tr>
                           </tbody>
                         </table>
                       </div>
@@ -332,32 +381,18 @@ export default function ProductPage() {
               <div className="tab-panel" role="tabpanel">
                 <div className="tab-shipping">
                   <div className="shipping-grid">
-                    {/* Two real delivery photos from /details/ */}
                     <div className="shipping-images">
                       <img src="/images/ship1.jpg" alt="Delivery" className="ship-img" />
                       <img src="/images/ship2.jpg" alt="Shipping" className="ship-img" />
                     </div>
                     <div className="shipping-info">
-                      <h3>Maecenas Iaculis</h3>
+                      <h3>Global Shipping</h3>
                       <p>
-                        Vestibulum curae torquent diam diam commodo parturient penatibus nunc dui
-                        adipiscing convallis bulum parturient suspendisse parturient. Parturient in
-                        parturient scelerisque nibh lectus quam a natoque adipiscing a vestibulum
-                        hendrerit et pharetra fames nunc natoque dui.
+                        We ship worldwide from Shenzhen, China using major express couriers.
+                        All orders are carefully packaged in original manufacturer boxes with
+                        full tracking provided from pickup to delivery.
                       </p>
-                      <h4>Adipiscing Convallis Bulum</h4>
-                      <ul className="shipping-list">
-                        <li>Vestibulum penatibus nunc dui adipiscing convallis bulum parturient suspendisse.</li>
-                        <li>Abitur parturient praesent lectus quam a natoque adipiscing a vestibulum hendre.</li>
-                        <li>Diam parturient dictumst parturient scelerisque nibh lectus.</li>
-                      </ul>
-                      <p style={{ marginTop: 18 }}>
-                        Scelerisque adipiscing bibendum sem vestibulum et in a a purus lectus faucibus
-                        lobortis tincidunt purus lectus nisl class eros. Condimentum a et ullamcorper
-                        dictumst mus et tristique elementum nam inceptos hac parturient scelerisque
-                        vestibulum amet elit ut volutpat.
-                      </p>
-                      <h4 style={{ marginTop: 24 }}>Shipping Details</h4>
+                      <h4>Shipping Details</h4>
                       <ul className="shipping-list">
                         <li>Delivery Time: <strong style={{ color: '#fff' }}>1–2 Working Days</strong></li>
                         <li>Express shipping: DHL / FedEx / UPS</li>
