@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { StreetProvider } from '@streetjs/react';
 import { createStreetClient } from '@streetjs/client';
 import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 import App from './App';
 import './styles/global.css';
 
