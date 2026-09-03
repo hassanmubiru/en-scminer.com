@@ -1,22 +1,56 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@streetjs/react';
+import { useAuthCtx } from '../context/AuthContext';
+import { API_BASE } from '../lib/api';
 import './MyAccountPage.css';
 
-type Tab = 'dashboard' | 'orders' | 'addresses' | 'account' | 'login';
+type Tab = 'dashboard' | 'orders' | 'addresses' | 'account';
+
+interface Order {
+  id: string;
+  order_number: string;
+  status: string;
+  total: number;
+  currency: string;
+  created_at: string;
+}
 
 export default function MyAccountPage() {
-  const { session, loading, login, register, logout } = useAuth<{ email: string; name: string }>();
+  const { user, loading, login, register, logout, getToken } = useAuthCtx();
   const [tab, setTab] = useState<Tab>('dashboard');
   const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' });
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+
+  // Orders state
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState('');
 
   function setF(k: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm((f) => ({ ...f, [k]: e.target.value }));
   }
+
+  // Fetch orders whenever the user logs in and navigates to the orders tab
+  useEffect(() => {
+    if (!user || tab !== 'orders') return;
+    const token = getToken();
+    if (!token) return;
+
+    setOrdersLoading(true);
+    setOrdersError('');
+    fetch(`${API_BASE}/api/v1/orders?limit=20`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.json())
+      .then((d: Record<string, unknown>) => {
+        setOrders((d['items'] as Order[]) ?? []);
+      })
+      .catch(() => setOrdersError('Failed to load orders.'))
+      .finally(() => setOrdersLoading(false));
+  }, [user, tab, getToken]);
 
   async function handleAuth(e: React.FormEvent) {
     e.preventDefault();
@@ -24,19 +58,19 @@ export default function MyAccountPage() {
     setAuthLoading(true);
     try {
       if (mode === 'login') {
-        await login({ email: form.email, password: form.password });
+        await login(form.email, form.password);
       } else {
-        await register({ name: form.name, email: form.email, password: form.password });
+        await register(form.email, form.password, form.firstName, form.lastName);
       }
-    } catch {
-      setAuthError(mode === 'login' ? 'Invalid email or password.' : 'Registration failed. Please try again.');
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : (mode === 'login' ? 'Invalid email or password.' : 'Registration failed.'));
     } finally {
       setAuthLoading(false);
     }
   }
 
-  // Not logged in — show login/register form
-  if (!loading && !session) {
+  // ── Not logged in ──────────────────────────────────────────────────────────
+  if (!loading && !user) {
     return (
       <div className="account-page">
         <div className="page-title-banner">
@@ -49,29 +83,32 @@ export default function MyAccountPage() {
             </nav>
           </div>
         </div>
+
         <div className="container account-auth-wrap">
           <div className="auth-card">
             <div className="auth-tabs">
-              <button
-                className={`auth-tab${mode === 'login' ? ' active' : ''}`}
-                onClick={() => setMode('login')}
-              >
+              <button className={`auth-tab${mode === 'login' ? ' active' : ''}`} onClick={() => setMode('login')}>
                 Login
               </button>
-              <button
-                className={`auth-tab${mode === 'register' ? ' active' : ''}`}
-                onClick={() => setMode('register')}
-              >
+              <button className={`auth-tab${mode === 'register' ? ' active' : ''}`} onClick={() => setMode('register')}>
                 Register
               </button>
             </div>
 
             <form onSubmit={handleAuth} className="auth-form">
               {mode === 'register' && (
-                <div className="form-row">
-                  <label htmlFor="a-name">Full Name *</label>
-                  <input id="a-name" type="text" required value={form.name} onChange={setF('name')} placeholder="John Smith" />
-                </div>
+                <>
+                  <div className="form-row-double">
+                    <div className="form-row">
+                      <label htmlFor="a-fname">First Name *</label>
+                      <input id="a-fname" type="text" required value={form.firstName} onChange={setF('firstName')} placeholder="John" />
+                    </div>
+                    <div className="form-row">
+                      <label htmlFor="a-lname">Last Name</label>
+                      <input id="a-lname" type="text" value={form.lastName} onChange={setF('lastName')} placeholder="Smith" />
+                    </div>
+                  </div>
+                </>
               )}
               <div className="form-row">
                 <label htmlFor="a-email">Email Address *</label>
@@ -79,8 +116,14 @@ export default function MyAccountPage() {
               </div>
               <div className="form-row">
                 <label htmlFor="a-pass">Password *</label>
-                <input id="a-pass" type="password" required value={form.password} onChange={setF('password')} placeholder="••••••••" />
+                <input id="a-pass" type="password" required value={form.password} onChange={setF('password')} placeholder="••••••••"
+                  minLength={mode === 'register' ? 8 : undefined} />
               </div>
+              {mode === 'register' && (
+                <p style={{ fontSize: 12, color: 'var(--text-muted, #888)', margin: '-8px 0 12px' }}>
+                  Minimum 8 characters.
+                </p>
+              )}
 
               {authError && <div className="notice notice-error">{authError}</div>}
 
@@ -102,7 +145,7 @@ export default function MyAccountPage() {
     );
   }
 
-  // Loading state
+  // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="loading-state" style={{ minHeight: '40vh' }}>
@@ -111,12 +154,19 @@ export default function MyAccountPage() {
     );
   }
 
-  // Logged in dashboard
+  // ── Logged in ──────────────────────────────────────────────────────────────
+  const displayName = [
+    String(user?.['first_name'] ?? user?.['firstName'] ?? ''),
+    String(user?.['last_name']  ?? user?.['lastName']  ?? ''),
+  ].filter(Boolean).join(' ') || String(user?.['email'] ?? 'Customer');
+
+  const email = String(user?.['email'] ?? '');
+
   const TABS: { id: Tab; label: string; icon: string }[] = [
-    { id: 'dashboard', label: 'Dashboard',       icon: '🏠' },
-    { id: 'orders',    label: 'Orders',           icon: '📦' },
-    { id: 'addresses', label: 'Addresses',        icon: '📍' },
-    { id: 'account',   label: 'Account Details',  icon: '👤' },
+    { id: 'dashboard', label: 'Dashboard',      icon: '🏠' },
+    { id: 'orders',    label: 'Orders',          icon: '📦' },
+    { id: 'addresses', label: 'Addresses',       icon: '📍' },
+    { id: 'account',   label: 'Account Details', icon: '👤' },
   ];
 
   return (
@@ -133,15 +183,15 @@ export default function MyAccountPage() {
       </div>
 
       <div className="container account-layout">
-        {/* Sidebar nav */}
+        {/* Sidebar */}
         <nav className="account-nav" aria-label="Account navigation">
           <div className="account-user">
             <div className="account-avatar">
-              {session?.name?.[0]?.toUpperCase() ?? '?'}
+              {displayName[0]?.toUpperCase() ?? '?'}
             </div>
             <div>
-              <strong>{session?.name ?? 'Customer'}</strong>
-              <span>{session?.email}</span>
+              <strong>{displayName}</strong>
+              <span>{email}</span>
             </div>
           </div>
           <ul>
@@ -163,23 +213,21 @@ export default function MyAccountPage() {
           </ul>
         </nav>
 
-        {/* Main content */}
+        {/* Content */}
         <div className="account-content">
+
+          {/* ── Dashboard ─────────────────────────────── */}
           {tab === 'dashboard' && (
             <div className="account-section">
               <h2>Dashboard</h2>
               <p>
-                Hello <strong>{session?.name}</strong>! From your account dashboard you can view
+                Hello <strong>{displayName}</strong>! From your account dashboard you can view
                 your recent orders, manage your shipping and billing addresses, and edit your
-                account details and password.
+                account details.
               </p>
               <div className="dashboard-cards">
                 {TABS.filter((t) => t.id !== 'dashboard').map((t) => (
-                  <button
-                    key={t.id}
-                    className="dashboard-card"
-                    onClick={() => setTab(t.id)}
-                  >
+                  <button key={t.id} className="dashboard-card" onClick={() => setTab(t.id)}>
                     <span className="dashboard-card-icon">{t.icon}</span>
                     <span>{t.label}</span>
                   </button>
@@ -188,17 +236,63 @@ export default function MyAccountPage() {
             </div>
           )}
 
+          {/* ── Orders ────────────────────────────────── */}
           {tab === 'orders' && (
             <div className="account-section">
               <h2>Orders</h2>
-              <div className="empty-orders">
-                <span>📦</span>
-                <p>No orders found. Start shopping to see your orders here.</p>
-                <Link to="/shop" className="btn btn-primary">Browse Products</Link>
-              </div>
+
+              {ordersLoading && (
+                <div className="loading-state"><span className="spinner" /> Loading orders…</div>
+              )}
+
+              {ordersError && (
+                <div className="notice notice-error">{ordersError}</div>
+              )}
+
+              {!ordersLoading && !ordersError && orders.length === 0 && (
+                <div className="empty-orders">
+                  <span>📦</span>
+                  <p>No orders yet. Start shopping to see your orders here.</p>
+                  <Link to="/shop" className="btn btn-primary">Browse Products</Link>
+                </div>
+              )}
+
+              {!ordersLoading && orders.length > 0 && (
+                <div className="orders-table-wrap">
+                  <table className="orders-table">
+                    <thead>
+                      <tr>
+                        <th>Order</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orders.map((o) => (
+                        <tr key={o.id}>
+                          <td>
+                            <span className="order-num">#{o.order_number}</span>
+                          </td>
+                          <td>{new Date(o.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                          <td>
+                            <span className={`order-status-badge status-${o.status.toLowerCase().replace('_', '-')}`}>
+                              {o.status.replace(/_/g, ' ')}
+                            </span>
+                          </td>
+                          <td className="order-total">
+                            ${o.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
 
+          {/* ── Addresses ─────────────────────────────── */}
           {tab === 'addresses' && (
             <div className="account-section">
               <h2>Addresses</h2>
@@ -215,19 +309,24 @@ export default function MyAccountPage() {
             </div>
           )}
 
+          {/* ── Account Details ───────────────────────── */}
           {tab === 'account' && (
             <div className="account-section">
               <h2>Account Details</h2>
               <form className="account-details-form" onSubmit={(e) => e.preventDefault()}>
                 <div className="form-row-double">
                   <div className="form-row">
-                    <label>Display Name</label>
-                    <input type="text" defaultValue={session?.name ?? ''} />
+                    <label>First Name</label>
+                    <input type="text" defaultValue={String(user?.['first_name'] ?? '')} />
                   </div>
                   <div className="form-row">
-                    <label>Email Address</label>
-                    <input type="email" defaultValue={session?.email ?? ''} />
+                    <label>Last Name</label>
+                    <input type="text" defaultValue={String(user?.['last_name'] ?? '')} />
                   </div>
+                </div>
+                <div className="form-row">
+                  <label>Email Address</label>
+                  <input type="email" defaultValue={email} />
                 </div>
                 <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '20px 0' }} />
                 <h4 style={{ marginBottom: 16, color: 'var(--title)' }}>Change Password</h4>
@@ -249,6 +348,7 @@ export default function MyAccountPage() {
               </form>
             </div>
           )}
+
         </div>
       </div>
     </div>
