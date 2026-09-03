@@ -1,0 +1,81 @@
+/* ─── Mobile bottom toolbar — only on mobile, matches original wd-toolbar ─── */
+.mobile-toolbar {
+  display: none; /* hidden on desktop */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 600;
+  background: var(--header-bg);
+  border-top: 1px solid rgba(255,255,255,.08);
+  height: 56px;
+  /* leave room for chat widget */
+}
+
+@media (max-width: 900px) {
+  .mobile-toolbar { display: flex; }
+  /* push page content above the toolbar */
+  main { padding-bottom: 56px; }
+}
+
+.toolbar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: rgba(255,255,255,.55);
+  text-decoration: none;
+  transition: color .2s;
+  min-width: 0;
+  padding: 6px 4px 4px;
+}
+.toolbar-item:hover,
+.toolbar-item.active { color: #fff; }
+
+.toolbar-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+.toolbar-icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.toolbar-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.toolbar-cart-count {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+  pointer-events: none;
+}

@@ -1,0 +1,208 @@
+/* ─── Trusted ASIC Miner section ─────────────────────────────────────────── */
+.trusted-section {
+  background: #0d0d0d;
+  padding: clamp(48px, 8vw, 80px) 0 clamp(40px, 7vw, 70px);
+  color: #fff;
+}
+.trusted-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.trusted-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(17px, 2.5vw, 22px);
+  font-weight: 700;
+  color: #fff;
+  max-width: min(680px, 100%);
+  line-height: 1.45;
+  margin-bottom: 24px;
+  overflow-wrap: break-word;
+}
+.trusted-body {
+  font-size: clamp(13px, 1.5vw, 14px);
+  color: rgba(255,255,255,.65);
+  line-height: 1.85;
+  max-width: min(780px, 100%);
+  margin-bottom: 16px;
+  overflow-wrap: break-word;
+}
+.trusted-body:last-of-type { margin-bottom: 40px; }
+
+/* Stat cards */
+.trusted-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: min(900px, 100%);
+}
+@media (max-width: 640px) { .trusted-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
+@media (max-width: 360px) { .trusted-stats { grid-template-columns: 1fr 1fr; gap: 10px; } }
+
+.trusted-stat-card {
+  background: #fff;
+  border-radius: 4px;
+  padding: clamp(18px, 4vw, 32px) 12px clamp(14px, 3vw, 24px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.tsc-value {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(22px, 3.5vw, 34px);
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+.tsc-label {
+  font-size: clamp(11px, 1.2vw, 13px);
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: .04em;
+  text-align: center;
+}
+.tsc-line {
+  display: block;
+  width: 32px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 1px;
+  margin-top: 4px;
+}
+
+/* ─── Section title (shared) ─────────────────────────────────────────────── */
+.section-title {
+  text-align: center;
+  margin-bottom: clamp(28px, 5vw, 48px);
+}
+.section-title h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(18px, 2.8vw, 28px);
+  font-weight: 700;
+  color: var(--title);
+  margin-bottom: 10px;
+  overflow-wrap: break-word;
+}
+.section-title p {
+  font-size: clamp(13px, 1.5vw, 15px);
+  color: var(--text);
+  max-width: min(480px, 100%);
+  margin: 0 auto;
+  line-height: 1.6;
+}
+.section-title .underline {
+  display: block;
+  width: 48px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+
+/* ─── Featured products ───────────────────────────────────────────────────── */
+.featured-section {
+  padding: clamp(48px, 8vw, 90px) 0 clamp(40px, 7vw, 80px);
+  background: #fff;
+}
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(14px, 2vw, 24px);
+}
+@media (max-width: 1100px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px)  { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 400px)  { .products-grid { grid-template-columns: 1fr; } }
+
+.view-all-wrap {
+  text-align: center;
+  margin-top: clamp(28px, 5vw, 48px);
+}
+
+/* ─── Why Choose Us — pill style ─────────────────────────────────────────── */
+.why-section {
+  padding: clamp(48px, 8vw, 80px) 0;
+  background: #0d0d0d;
+}
+.why-section .section-title h2 { color: #fff; }
+.why-section .section-title .underline { background: #fff; }
+
+.why-pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: min(900px, 100%);
+  margin: 0 auto;
+}
+@media (max-width: 860px) { .why-pills { grid-template-columns: 1fr; max-width: 560px; } }
+@media (max-width: 480px) { .why-pills { gap: 12px; } }
+
+.why-pill {
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 40px;
+  padding: clamp(16px, 3vw, 22px) clamp(18px, 3vw, 28px);
+  font-family: 'Lato', sans-serif;
+  font-size: clamp(12px, 1.3vw, 13px);
+  font-weight: 600;
+  color: rgba(255,255,255,.85);
+  text-align: center;
+  line-height: 1.5;
+  transition: border-color .2s, background .2s;
+  overflow-wrap: break-word;
+}
+.why-pill:hover {
+  border-color: var(--primary);
+  background: rgba(198,19,29,.08);
+  color: #fff;
+}
+
+/* ─── Founders' Perceptions ──────────────────────────────────────────────── */
+.founders-section {
+  padding: clamp(48px, 8vw, 80px) 0 clamp(56px, 9vw, 90px);
+  background: #0d0d0d;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.founders-section .section-title h2 { color: #fff; }
+.founders-section .underline        { background: #fff; }
+
+.founders-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(16px, 2.5vw, 28px);
+}
+@media (max-width: 900px) { .founders-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 400px) { .founders-grid { grid-template-columns: 1fr; max-width: 300px; margin: 0 auto; } }
+
+.founder-card { display: flex; flex-direction: column; }
+.founder-photo-wrap {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  background: #1a1a1a;
+}
+.founder-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform .4s ease;
+}
+.founder-card:hover .founder-photo { transform: scale(1.04); }
+.founder-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(13px, 1.5vw, 15px);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+  overflow-wrap: break-word;
+}
+.founder-quote {
+  font-size: clamp(12px, 1.3vw, 13px);
+  color: rgba(255,255,255,.55);
+  line-height: 1.75;
+  overflow-wrap: break-word;
+}

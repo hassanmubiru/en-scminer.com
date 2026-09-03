@@ -1,0 +1,136 @@
+/* ─── Chat widget — fixed bottom-left matching original Chaty position ────── */
+.chat-widget {
+  position: fixed;
+  bottom: 25px;
+  left: 25px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: 10px;
+  /* don't interfere with scroll-to-top (bottom-right) */
+}
+@media (max-width: 480px) {
+  .chat-widget { bottom: 16px; left: 16px; }
+}
+
+/* ─── Toggle button ──────────────────────────────────────────────────────── */
+.chat-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 0 10px;
+  height: 50px;
+  background: #A886CD;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,.25);
+  transition: background .2s, transform .2s, box-shadow .2s;
+  min-width: 50px;
+  flex-shrink: 0;
+}
+.chat-toggle:hover {
+  background: #9470c0;
+  box-shadow: 0 6px 22px rgba(0,0,0,.3);
+  transform: translateY(-2px);
+}
+.chat-toggle svg { flex-shrink: 0; }
+.chat-toggle-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  letter-spacing: .03em;
+}
+
+/* ─── Channels container ─────────────────────────────────────────────────── */
+.chat-channels {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* closed state */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px) scale(.95);
+  transform-origin: bottom left;
+  transition: opacity .22s ease, transform .22s ease;
+}
+.chat-open .chat-channels {
+  opacity: 1;
+  pointer-events: all;
+  transform: none;
+}
+
+/* ─── Individual channel button ──────────────────────────────────────────── */
+.chat-channel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px 0 6px;
+  height: 46px;
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.18);
+  text-decoration: none;
+  color: #333;
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform .18s ease, box-shadow .18s ease;
+  /* stagger animation when opening */
+  animation: none;
+}
+.chat-open .chat-channel {
+  animation: chatChannelIn .25s ease both;
+}
+.chat-open .chat-channel:nth-child(1) { animation-delay: .00s; }
+.chat-open .chat-channel:nth-child(2) { animation-delay: .04s; }
+.chat-open .chat-channel:nth-child(3) { animation-delay: .08s; }
+.chat-open .chat-channel:nth-child(4) { animation-delay: .12s; }
+.chat-open .chat-channel:nth-child(5) { animation-delay: .16s; }
+
+@keyframes chatChannelIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.chat-channel:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 18px rgba(0,0,0,.22);
+  color: #111;
+}
+
+.chat-channel-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.chat-channel-icon svg,
+.chat-channel-icon img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: block;
+}
+
+.chat-channel-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Mobile: hide label on very small screens to save space ─────────────── */
+@media (max-width: 360px) {
+  .chat-toggle-label  { display: none; }
+  .chat-toggle        { padding: 0 10px; border-radius: 50%; width: 50px; justify-content: center; }
+  .chat-channel-label { display: none; }
+  .chat-channel       { padding: 0 6px; width: 46px; border-radius: 50%; justify-content: center; }
+}

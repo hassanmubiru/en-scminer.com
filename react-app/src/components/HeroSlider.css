@@ -1,0 +1,330 @@
+/* ─── Hero Slider container ─────────────────────────────────────────────── */
+.hero-slider {
+  position: relative;
+  width: 100%;
+  min-height: clamp(380px, 60vh, 700px);
+  height: clamp(380px, 60vh, 700px);
+  overflow: hidden;
+  background: #101010;
+  user-select: none;
+}
+@media (max-width: 900px)  { .hero-slider { height: auto; min-height: 440px; } }
+@media (max-width: 640px)  { .hero-slider { min-height: 0; height: auto; } }
+
+/* ─── Background layers ──────────────────────────────────────────────────── */
+.slider-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  opacity: 0;
+  transition: opacity 1s ease;
+  transform: scale(1.04);
+  will-change: opacity, transform;
+}
+.slider-bg-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 1s ease, transform 8s ease;
+}
+
+/* ─── Gradient overlay ───────────────────────────────────────────────────── */
+.slider-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg,
+      rgba(16,16,16,.95) 0%,
+      rgba(16,16,16,.75) 45%,
+      rgba(16,16,16,.25) 75%,
+      transparent 100%),
+    linear-gradient(180deg, transparent 55%, rgba(16,16,16,.7) 100%);
+}
+/* on mobile background covers more since image is on top */
+@media (max-width: 640px) {
+  .slider-overlay {
+    background: linear-gradient(180deg,
+      rgba(16,16,16,.3) 0%,
+      rgba(16,16,16,.7) 50%,
+      rgba(16,16,16,.96) 100%);
+  }
+}
+
+/* ─── Content wrapper ────────────────────────────────────────────────────── */
+.slider-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+}
+/* on mobile: let content flow naturally */
+@media (max-width: 640px) {
+  .slider-content {
+    position: relative;
+    inset: auto;
+    display: block;
+  }
+}
+
+/* slide animations */
+.slide-in       { animation: slideIn .7s cubic-bezier(.19,1,.22,1) both; }
+.slide-out-next { animation: slideOutNext .7s cubic-bezier(.19,1,.22,1) both; }
+.slide-out-prev { animation: slideOutPrev .7s cubic-bezier(.19,1,.22,1) both; }
+@keyframes slideIn       { from { opacity:0; transform:translateX(40px);  } to { opacity:1; transform:none; } }
+@keyframes slideOutNext  { from { opacity:1; transform:none; } to { opacity:0; transform:translateX(-40px); } }
+@keyframes slideOutPrev  { from { opacity:1; transform:none; } to { opacity:0; transform:translateX(40px);  } }
+
+/* ─── Inner layout — text LEFT, image RIGHT on desktop ──────────────────── */
+.slider-inner {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 40px;
+  align-items: center;
+  height: 100%;
+  padding-block: 40px;
+}
+/* tablet: shrink image column */
+@media (max-width: 1100px) {
+  .slider-inner { grid-template-columns: 1fr 320px; gap: 28px; }
+}
+/* small tablet: hide image, text takes full width */
+@media (max-width: 900px) {
+  .slider-inner { grid-template-columns: 1fr; }
+  .slider-product-img { display: none; }
+}
+/* mobile: vertical stack — image on top, text below */
+@media (max-width: 640px) {
+  .slider-inner {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    gap: 0;
+    padding-block: 0;
+    height: auto;
+  }
+  .slider-product-img { display: flex; order: -1; } /* image first on mobile */
+}
+
+/* ─── Text side ──────────────────────────────────────────────────────────── */
+.slider-text {
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  min-width: 0;
+  /* bottom padding so dots don't overlap on desktop */
+  padding-bottom: 50px;
+}
+@media (max-width: 640px) {
+  .slider-text {
+    padding: 24px clamp(16px,5vw,30px) 70px; /* extra bottom for dots */
+    text-align: center;
+    align-items: center;
+  }
+}
+
+.slider-eyebrow {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(12px, 1.3vw, 15px);
+  font-weight: 100;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.7);
+  margin-bottom: 12px;
+  animation: fadeUpDelay .8s .1s both;
+}
+
+.slider-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(28px, 5vw, 80px);
+  font-weight: 100;
+  line-height: 1.05;
+  color: #fff;
+  margin: 0 0 4px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  animation: fadeUpDelay .8s .2s both;
+}
+.slider-title-bold { font-weight: 600; }
+
+.slider-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(12px, 1.4vw, 18px);
+  font-weight: 400;
+  color: rgba(255,255,255,.55);
+  margin: 0 0 14px;
+  animation: fadeUpDelay .8s .3s both;
+}
+
+.slider-desc {
+  font-family: 'Lato', sans-serif;
+  font-size: clamp(13px, 1.4vw, 16px);
+  color: rgba(255,255,255,.8);
+  line-height: 1.75;
+  max-width: min(560px, 100%);
+  margin: 0 0 18px;
+  overflow-wrap: break-word;
+  animation: fadeUpDelay .8s .35s both;
+}
+
+.slider-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 20px;
+  animation: fadeUpDelay .8s .4s both;
+}
+
+.slider-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  animation: fadeUpDelay .8s .45s both;
+}
+@media (max-width: 640px) {
+  .slider-actions { justify-content: center; }
+  /* CTA button full-width on small phones */
+  .slider-actions .btn { flex: 1 1 140px; max-width: 200px; }
+}
+@media (max-width: 360px) {
+  .slider-actions { flex-direction: column; align-items: stretch; }
+  .slider-actions .btn { max-width: 100%; }
+}
+
+.slider-cta { font-weight: 900 !important; font-size: 13px !important; letter-spacing: .08em; }
+
+@keyframes fadeUpDelay {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Product image side ─────────────────────────────────────────────────── */
+.slider-product-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px 0;
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .slider-product-img {
+    height: auto;
+    padding: 28px clamp(16px,8vw,60px) 0;
+    /* limit image height on mobile so text is still visible */
+    max-height: 260px;
+    overflow: hidden;
+  }
+}
+@media (max-width: 390px) {
+  .slider-product-img { max-height: 200px; }
+}
+
+.slider-miner-img {
+  max-height: 420px;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 60px rgba(0,0,0,.8));
+  animation: minerFadeIn .9s .2s cubic-bezier(.19,1,.22,1) both;
+  border-radius: 8px;
+}
+@media (max-width: 640px) {
+  .slider-miner-img { max-height: 220px; border-radius: 6px; }
+}
+@keyframes minerFadeIn {
+  from { opacity: 0; transform: translateX(40px) scale(.95); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ─── Arrow buttons ──────────────────────────────────────────────────────── */
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 46px;
+  height: 46px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 3px;
+  color: #fff;
+  font-size: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s, border-color .2s, opacity .2s;
+  opacity: 0;
+  /* ensure minimum touch target */
+  min-width: 44px;
+  min-height: 44px;
+}
+.hero-slider:hover .slider-arrow { opacity: 1; }
+.slider-arrow:hover { background: var(--accent-btn); border-color: var(--accent-btn); }
+.slider-arrow-prev { left: 12px; }
+.slider-arrow-next { right: 12px; }
+
+@media (max-width: 768px) {
+  .slider-arrow { opacity: 1; width: 38px; height: 38px; font-size: 22px; }
+  .slider-arrow-prev { left: 6px; }
+  .slider-arrow-next { right: 6px; }
+}
+@media (max-width: 480px) {
+  /* hide arrows on very small screens — use dots instead */
+  .slider-arrow { display: none; }
+}
+
+/* ─── Dot navigation ─────────────────────────────────────────────────────── */
+.slider-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+}
+.slider-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.5);
+  background: transparent;
+  cursor: pointer;
+  transition: background .25s, border-color .25s, transform .25s;
+  padding: 0;
+  /* touch target */
+  position: relative;
+}
+.slider-dot::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+.slider-dot:hover    { border-color: #fff; transform: scale(1.2); }
+.slider-dot-active   { background: #fff; border-color: #fff; transform: scale(1.15); }
+
+/* ─── Progress bar ───────────────────────────────────────────────────────── */
+.slider-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255,255,255,.1);
+  z-index: 10;
+}
+.slider-progress-bar {
+  height: 100%;
+  background: var(--accent-btn);
+  transform-origin: left;
+  animation: progressFill linear forwards;
+}
+@keyframes progressFill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
