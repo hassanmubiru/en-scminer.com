@@ -120,7 +120,7 @@ export default function AdminAudit() {
                           )}
                         </td>
                       </tr>
-                      {expanded === e.id && (
+                  {expanded === e.id && (
                         <tr key={e.id + '-exp'} style={{ background: '#f8f9fb' }}>
                           <td colSpan={6} style={{ padding: '12px 16px' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
