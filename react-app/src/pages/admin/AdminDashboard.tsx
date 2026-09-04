@@ -70,7 +70,7 @@ export default function AdminDashboard() {
       {/* ── Orders by status ──────────────────────────────────────── */}
       <div className="admin-card">
         <div className="admin-card-header">Orders by Status</div>
-        <div style={{ padding: '20px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px,1fr))', gap: 12 }}>
+        <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px,1fr))', gap: 12 }}>
           {[
             { label: 'Pending Payment', key: 'PENDING_PAYMENT', color: '#856404', bg: '#fff3cd' },
             { label: 'Paid',            key: 'PAID',            color: '#0a3622', bg: '#d1e7dd' },
