@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthCtx } from '../context/AuthContext';
 import { API_BASE } from '../lib/api';
 import './MyAccountPage.css';
@@ -17,6 +17,7 @@ interface Order {
 
 export default function MyAccountPage() {
   const { user, loading, login, register, logout, getToken } = useAuthCtx();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('dashboard');
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' });
