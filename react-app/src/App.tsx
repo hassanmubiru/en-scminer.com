@@ -11,6 +11,7 @@ import MyAccountPage from './pages/MyAccountPage';
 
 // Admin panel
 import AdminLayout     from './pages/admin/AdminLayout';
+import AdminLogin      from './pages/admin/AdminLogin';
 import AdminDashboard  from './pages/admin/AdminDashboard';
 import AdminOrders     from './pages/admin/AdminOrders';
 import AdminCustomers  from './pages/admin/AdminCustomers';
@@ -34,6 +35,7 @@ export default function App() {
       </Route>
 
       {/* ── Admin panel — own layout, no store header/footer ───── */}
+      <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="orders"    element={<AdminOrders />} />
