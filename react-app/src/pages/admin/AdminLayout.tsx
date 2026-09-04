@@ -75,7 +75,7 @@ export default function AdminLayout() {
               </div>
             </div>
           )}
-          <button className="admin-logout-btn" onClick={() => { logout(); navigate('/'); }} title="Logout">
+          <button className="admin-logout-btn" onClick={() => { logout(); navigate('/admin/login'); }} title="Logout">
             🚪
           </button>
         </div>
