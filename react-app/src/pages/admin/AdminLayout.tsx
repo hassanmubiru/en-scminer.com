@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthCtx } from '../../context/AuthContext';
 import './admin.css';
@@ -17,7 +17,18 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
-  if (loading) {
+  const roles = user ? (user as Record<string, unknown>)['roles'] as string[] ?? [] : [];
+  const isAdmin = roles.some(r => ['admin', 'super_admin'].includes(r));
+
+  // Redirect to admin login if not authenticated or not an admin
+  useEffect(() => {
+    if (loading) return;
+    if (!user || !isAdmin) {
+      navigate('/admin/login', { replace: true });
+    }
+  }, [user, loading, isAdmin, navigate]);
+
+  if (loading || !isAdmin) {
     return (
       <div className="admin-loading">
         <span className="spinner" /> Loading…
@@ -25,28 +36,10 @@ export default function AdminLayout() {
     );
   }
 
-  const isAdmin = user && Array.isArray((user as Record<string,unknown>)['roles'])
-    ? ((user as Record<string,unknown>)['roles'] as string[]).some(r => ['admin','super_admin'].includes(r))
-    : false;
-
-  if (!isAdmin) {
-    return (
-      <div className="admin-gate">
-        <div className="admin-gate-card">
-          <h2>Admin Access Required</h2>
-          <p>You need admin credentials to access this area.</p>
-          <button className="btn btn-primary" onClick={() => navigate('/my-account')}>
-            Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const isSuperAdmin = ((user as Record<string,unknown>)['roles'] as string[]).includes('super_admin');
+  const isSuperAdmin = roles.includes('super_admin');
   const displayName = [
-    String((user as Record<string,unknown>)['first_name'] ?? ''),
-    String((user as Record<string,unknown>)['last_name'] ?? ''),
+    String((user as Record<string, unknown>)['first_name'] ?? ''),
+    String((user as Record<string, unknown>)['last_name']  ?? ''),
   ].filter(Boolean).join(' ') || 'Admin';
 
   return (
