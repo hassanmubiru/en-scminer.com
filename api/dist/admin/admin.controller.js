@@ -145,6 +145,42 @@ let AdminController = class AdminController {
         });
         ctx.json(result);
     }
+    async updatePaymentStatus(ctx) {
+        const user = getUser(ctx);
+        if (!this.isAdmin(ctx)) {
+            ctx.json({ error: { code: 'FORBIDDEN', message: 'Admin required' } }, 403);
+            return;
+        }
+        const b = ctx.body;
+        const status = String(b?.['status'] ?? '');
+        const note = String(b?.['note'] ?? '');
+        const ALLOWED = ['MANUAL_REVIEW', 'CANCELLED', 'REFUNDED', 'FAILED', 'AWAITING_PAYMENT'];
+        if (!ALLOWED.includes(status)) {
+            ctx.json({ error: { code: 'INVALID_STATUS', message: `Use /manual-confirm for CONFIRMED. Allowed: ${ALLOWED.join(', ')}` } }, 400);
+            return;
+        }
+        const pool = getPool();
+        const before = await pool.query(`SELECT status, order_id FROM payments WHERE id = $1`, [ctx.params['id']]);
+        if (!before.rows[0]) {
+            ctx.json({ error: { code: 'NOT_FOUND', message: 'Payment not found' } }, 404);
+            return;
+        }
+        const prev = before.rows[0];
+        await pool.query(`UPDATE payments SET status = $1, updated_at = NOW() WHERE id = $2`, [status, ctx.params['id']]);
+        // If cancelling — also update order
+        if (status === 'CANCELLED') {
+            await pool.query(`UPDATE orders SET status = 'CANCELLED', updated_at = NOW() WHERE id = $1`, [prev['order_id']]);
+        }
+        await this.audit.log({
+            actorId: user?.id,
+            action: 'ADMIN_PAYMENT_STATUS_UPDATE',
+            entity: 'payments',
+            entityId: String(ctx.params['id']),
+            before: { status: prev['status'] },
+            after: { status, note },
+        });
+        ctx.json({ success: true });
+    }
     async getSettings(ctx) {
         if (!this.isAdmin(ctx)) {
             ctx.json({ error: { code: 'FORBIDDEN', message: 'Admin required' } }, 403);
@@ -226,6 +262,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "auditLog", null);
+__decorate([
+    Patch('/payments/:id/status'),
+    ApiOperation({ summary: '[Admin] Update payment status (non-confirm transitions)', tags: ['admin'] }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "updatePaymentStatus", null);
 __decorate([
     Get('/settings'),
     ApiOperation({ summary: '[Admin] Get system settings', tags: ['admin'] }),
