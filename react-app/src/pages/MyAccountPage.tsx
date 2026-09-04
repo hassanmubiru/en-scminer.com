@@ -34,6 +34,15 @@ export default function MyAccountPage() {
       setForm((f) => ({ ...f, [k]: e.target.value }));
   }
 
+  // If an admin visits /my-account while already logged in, send them to /admin
+  useEffect(() => {
+    if (!user || loading) return;
+    const roles = (user as Record<string, unknown>)['roles'] as string[] | undefined;
+    if (roles?.some(r => ['admin', 'super_admin'].includes(r))) {
+      navigate('/admin', { replace: true });
+    }
+  }, [user, loading, navigate]);
+
   // Fetch orders whenever the user logs in and navigates to the orders tab
   useEffect(() => {
     if (!user || tab !== 'orders') return;
@@ -63,6 +72,7 @@ export default function MyAccountPage() {
       } else {
         await register(form.email, form.password, form.firstName, form.lastName);
       }
+      // Admin redirect is handled by the useEffect above once user state updates
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : (mode === 'login' ? 'Invalid email or password.' : 'Registration failed.'));
     } finally {
