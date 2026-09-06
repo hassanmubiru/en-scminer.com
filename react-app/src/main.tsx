@@ -8,8 +8,8 @@ import { AuthProvider } from './context/AuthContext';
 import App from './App';
 import './styles/global.css';
 
-// StreetJS client – real backend running on localhost:3001
-const client = createStreetClient({ baseUrl: 'http://localhost:3001' });
+// StreetJS client — reads VITE_API_URL in production, falls back to localhost in dev
+const client = createStreetClient({ baseUrl: import.meta.env['VITE_API_URL'] ?? 'http://localhost:3001' });
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -1,0 +1,29 @@
+# ── Dependencies ─────────────────────────────────────────────────────────────
+node_modules/
+**/node_modules/
+
+# ── Build outputs ─────────────────────────────────────────────────────────────
+api/dist/
+react-app/dist/
+
+# ── Environment secrets — NEVER commit real .env files ───────────────────────
+.env
+api/.env
+react-app/.env
+react-app/.env.production
+# (keep .env.example and .env.production.example — they are safe templates)
+
+# ── TypeScript cache ──────────────────────────────────────────────────────────
+*.tsbuildinfo
+react-app/tsconfig.tsbuildinfo
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ── Uploads (user-generated content — stored on object storage in production) ─
+api/uploads/

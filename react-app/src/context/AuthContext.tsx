@@ -6,7 +6,9 @@
  * The token is written on login/register success and cleared on logout.
  */
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { API_BASE } from '../lib/api';
+
+// Reads VITE_API_URL at build time (set in Vercel env vars for production)
+const API_BASE_URL = import.meta.env['VITE_API_URL'] ?? 'http://localhost:3001';
 
 const TOKEN_KEY = 'scminer_access_token';
 
@@ -37,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem(TOKEN_KEY);
     if (!saved) { setState(s => ({ ...s, loading: false })); return; }
 
-    fetch(`${API_BASE}/auth/session`, {
+    fetch(`${API_BASE_URL}/auth/session`, {
       headers: { Authorization: `Bearer ${saved}` },
     })
       .then(r => r.json())
@@ -56,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function login(email: string, password: string) {
-    const res = await fetch(`${API_BASE}/auth/login`, {
+    const res = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -70,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function register(email: string, password: string, firstName: string, lastName = '') {
-    const res = await fetch(`${API_BASE}/auth/register`, {
+    const res = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, firstName, lastName }),
@@ -88,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(TOKEN_KEY);
     setState({ token: null, user: null, loading: false });
     if (token) {
-      fetch(`${API_BASE}/auth/logout`, {
+      fetch(`${API_BASE_URL}/auth/logout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({}),
