@@ -9,6 +9,7 @@ primary_region = "iad"   # Washington DC — change to nearest: lhr=London, fra=
   NODE_ENV = "production"
   HOST     = "0.0.0.0"
   PORT     = "3000"
+  # DATABASE_URL is set as a secret via fly secrets set
 
 [http_service]
   internal_port        = 3000
