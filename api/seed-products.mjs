@@ -9,7 +9,7 @@ import { writeFileSync, unlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const DB_URL = 'postgresql://scminer:scminer_dev_pass_2024@localhost:5432/scminer';
+const DB_URL = process.env['DATABASE_URL'] ?? 'postgresql://scminer:scminer_dev_pass_2024@localhost:5432/scminer';
 
 function uuid() { return crypto.randomUUID(); }
 function esc(v) { return v === null || v === undefined ? 'NULL' : `'${String(v).replace(/'/g, "''")}'`; }
