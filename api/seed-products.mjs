@@ -115,7 +115,7 @@ writeFileSync(tmpFile, sql, 'utf8');
 console.log(`Running seed SQL (${lines.length} lines)...`);
 try {
   const out = execSync(
-    `PGPASSWORD=scminer_dev_pass_2024 psql -h localhost -U scminer -d scminer -f "${tmpFile}"`,
+    `psql "${DB_URL}" -f "${tmpFile}"`,
     { encoding: 'utf8' },
   );
   console.log(out);
