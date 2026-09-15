@@ -169,8 +169,8 @@ export default function Header() {
               </li>
             </ul>
             <div className="mobile-drawer-contact">
-              <div>📧 info@en-scminer.com</div>
-              <div>📞 +1 (424) 513-3056</div>
+              <div>📧 scminerantminer@gmail.com</div>
+              <div>💬 Zangi: 2293029443</div>
             </div>
           </nav>
         </>

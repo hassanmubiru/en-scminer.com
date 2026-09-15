@@ -3,15 +3,15 @@ import './ChatWidget.css';
 
 const CHANNELS = [
   {
-    id: 'whatsapp',
-    label: 'WhatsApp',
-    url: 'https://web.whatsapp.com/send?phone=17432011306',
-    color: '#49E670',
+    id: 'zangi',
+    label: 'Zangi: 2293029443',
+    url: 'https://zangi.com',
+    color: '#6C3FCF',
     icon: (
       <svg width="22" height="22" viewBox="0 0 39 39" fill="none">
-        <circle cx="19.44" cy="19.44" r="19.44" fill="#49E670" />
-        <path d="M27.5 11.4a11.1 11.1 0 0 0-15.7 15.7l-1.8 5.5 5.7-1.8A11.1 11.1 0 0 0 27.5 11.4z" fill="#fff" />
-        <path d="M23.7 21.3c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.2-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.6c.1-.2.1-.3.2-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.6s1.1 3 1.3 3.2c.2.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.7-.4z" fill="#49E670" />
+        <circle cx="19.44" cy="19.44" r="19.44" fill="#6C3FCF" />
+        <path d="M10 14h19v11H10z" stroke="#fff" strokeWidth="1.5" fill="none" rx="2" />
+        <path d="M10 14l9.5 7 9.5-7" stroke="#fff" strokeWidth="1.5" fill="none" />
       </svg>
     ),
   },
@@ -29,14 +29,15 @@ const CHANNELS = [
     ),
   },
   {
-    id: 'phone',
-    label: 'Phone',
-    url: 'tel:+14245133056',
-    color: '#03E78B',
+    id: 'email',
+    label: 'Email Us',
+    url: 'mailto:scminerantminer@gmail.com',
+    color: '#E05C3A',
     icon: (
       <svg width="22" height="22" viewBox="0 0 39 39" fill="none">
-        <circle cx="19.44" cy="19.44" r="19.44" fill="#03E78B" />
-        <path d="M26 24.9c-.3-.3-.8-.5-1.3-.6-.6-.2-1.6-.7-1.8-.8-.2-.1-.4-.1-.6.1l-1 1.1c-.2.2-.4.2-.6.1-1.4-.8-2.8-2-3.8-3.4-.9-1.4-1.5-3-1.5-4.3 0-.2.1-.4.3-.5l1.3-.8c.2-.1.3-.4.2-.6l-.6-1.8c-.2-.5-.5-.9-.9-1.1-.4-.2-.9-.2-1.3 0l-.8.5c-1.4 1-1.9 2.8-1.3 4.5 1.2 3.5 3.6 6.5 6.9 8.5 1.5.9 3.3 1.1 4.9.5l.8-.5c.4-.2.6-.7.5-1.2-.1-.5-.3-1-.4-1.3z" fill="#fff" />
+        <circle cx="19.44" cy="19.44" r="19.44" fill="#E05C3A" />
+        <rect x="9" y="13" width="21" height="13" rx="2" stroke="#fff" strokeWidth="1.5" fill="none" />
+        <path d="M9 13l10.5 8L30 13" stroke="#fff" strokeWidth="1.5" fill="none" />
       </svg>
     ),
   },
