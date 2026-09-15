@@ -45,14 +45,6 @@ export default function Footer() {
                 Shenzhen, Guangdong Province, China
               </li>
               <li>
-                <IconPhone />
-                Phone: +1 (424) 513-3056 (direct call or text)
-              </li>
-              <li>
-                <IconPhone />
-                Phone: +1 (743) 201 1306 (WhatsApp Only)
-              </li>
-              <li>
                 <IconMail />
                 Email: scminerantminer@gmail.com
               </li>
