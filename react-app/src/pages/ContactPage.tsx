@@ -88,16 +88,12 @@ export default function ContactPage() {
           </div>
 
           <div className="contact-info-box">
-            <div className="cib-icon">📞</div>
-            <div className="cib-tag">PHONE / WHATSAPP</div>
-            <h3 className="cib-title">CALL OR TEXT US</h3>
+            <div className="cib-icon">💬</div>
+            <div className="cib-tag">ZANGI</div>
+            <h3 className="cib-title">ZANGI MESSENGER</h3>
             <p className="cib-text">
-              +1 (424) 513-3056<br />
-              <span className="cib-sub">(direct call or text)</span>
-            </p>
-            <p className="cib-text">
-              +1 (743) 201 1306<br />
-              <span className="cib-sub">(WhatsApp Only)</span>
+              Account: <strong>2293029443</strong><br />
+              <span className="cib-sub">Message us on Zangi</span>
             </p>
           </div>
 
