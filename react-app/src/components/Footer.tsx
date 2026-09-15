@@ -54,7 +54,11 @@ export default function Footer() {
               </li>
               <li>
                 <IconMail />
-                Email: info@en-scminer.com
+                Email: scminerantminer@gmail.com
+              </li>
+              <li>
+                <IconZangi />
+                Zangi: 2293029443
               </li>
             </ul>
           </div>
@@ -121,6 +125,15 @@ function IconMail() {
       style={{ flexShrink: 0 }}>
       <rect x="2" y="4" width="20" height="16" rx="2" />
       <path d="m2 7 10 7 10-7" />
+    </svg>
+  );
+}
+function IconZangi() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2"
+      style={{ flexShrink: 0 }}>
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
   );
 }

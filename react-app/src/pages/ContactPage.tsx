@@ -106,11 +106,21 @@ export default function ContactPage() {
             <div className="cib-tag">EMAIL</div>
             <h3 className="cib-title">SEND US AN EMAIL</h3>
             <p className="cib-text">
-              <a href="mailto:info@en-scminer.com">info@en-scminer.com</a>
+              <a href="mailto:scminerantminer@gmail.com">scminerantminer@gmail.com</a>
             </p>
             <p className="cib-text cib-hours">
               Mon – Sat: 09:00 – 20:00 CST<br />
               <span className="cib-sub">Response within 24 hours</span>
+            </p>
+          </div>
+
+          <div className="contact-info-box">
+            <div className="cib-icon">💬</div>
+            <div className="cib-tag">ZANGI</div>
+            <h3 className="cib-title">ZANGI MESSENGER</h3>
+            <p className="cib-text">
+              Account: <strong>2293029443</strong><br />
+              <span className="cib-sub">Message us on Zangi</span>
             </p>
           </div>
 
