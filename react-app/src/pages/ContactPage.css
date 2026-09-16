@@ -171,3 +171,29 @@
 
 /* ─── Map ────────────────────────────────────────────────────────────────── */
 .contact-map { background: #e5e5e5; line-height: 0; }
+
+/* ─── Crypto wallet addresses in contact info box ───────────────────────── */
+.cib-wallets { width: 100%; margin-top: 8px; }
+.cib-wallet-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.cib-wallet-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.cib-wallet-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: rgba(255,255,255,.6);
+}
+.cib-wallet-addr {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  color: #fff;
+  word-break: break-all;
+  line-height: 1.5;
+}
