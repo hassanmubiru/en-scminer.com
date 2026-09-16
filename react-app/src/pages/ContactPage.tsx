@@ -123,11 +123,24 @@ export default function ContactPage() {
           <div className="contact-info-box">
             <div className="cib-icon">💳</div>
             <div className="cib-tag">PAYMENT</div>
-            <h3 className="cib-title">WE ACCEPT</h3>
-            <div className="cib-payment-badges">
-              {['USD', 'BTC', 'ETH', 'ETC', 'USDT ERC20', 'USDT TRC20'].map((m) => (
-                <span key={m} className="cib-badge">{m}</span>
-              ))}
+            <h3 className="cib-title">CRYPTO WALLETS</h3>
+            <div className="cib-wallets">
+              <div className="cib-wallet-row">
+                <span className="cib-wallet-label">₿ BTC</span>
+                <span className="cib-wallet-addr">bc1qwq8gzsk8y5az4vptget996vh4f2ggv77kgm2f0</span>
+              </div>
+              <div className="cib-wallet-row">
+                <span className="cib-wallet-label">◈ USDT BEP-20</span>
+                <span className="cib-wallet-addr">0x18a3302C57c0F7b4C43fb4461285ffd55430AF46</span>
+              </div>
+              <div className="cib-wallet-row">
+                <span className="cib-wallet-label">Ξ ETH</span>
+                <span className="cib-wallet-addr">0x18a3302C57c0F7b4C43fb4461285ffd55430AF46</span>
+              </div>
+              <div className="cib-wallet-row">
+                <span className="cib-wallet-label">◎ USDT TRC-20</span>
+                <span className="cib-wallet-addr">TYyjYb2RBdMj2u21tfJhjEiPdqS4C3VAJJ</span>
+              </div>
             </div>
           </div>
 
