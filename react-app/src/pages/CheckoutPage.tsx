@@ -169,7 +169,48 @@ export default function CheckoutPage() {
             <span className="done-icon">✅</span>
             <h2>Order Placed Successfully!</h2>
             {orderNumber && <p className="done-order-num">Order #{orderNumber}</p>}
-            <p>Thank you for your order. Our team will contact you within 24 hours with payment details and shipping information.</p>
+            <p>Thank you for your order. Please send your payment to one of the addresses below, then email us your transaction ID.</p>
+
+            <div className="payment-wallets">
+              <h3 className="wallets-title">Send Payment To</h3>
+
+              <div className="wallet-item">
+                <div className="wallet-header">
+                  <span className="wallet-icon">₿</span>
+                  <span className="wallet-name">Bitcoin (BTC)</span>
+                </div>
+                <div className="wallet-address">bc1qwq8gzsk8y5az4vptget996vh4f2ggv77kgm2f0</div>
+              </div>
+
+              <div className="wallet-item">
+                <div className="wallet-header">
+                  <span className="wallet-icon">◈</span>
+                  <span className="wallet-name">USDT BEP-20 (BNB Chain)</span>
+                </div>
+                <div className="wallet-address">0x18a3302C57c0F7b4C43fb4461285ffd55430AF46</div>
+              </div>
+
+              <div className="wallet-item">
+                <div className="wallet-header">
+                  <span className="wallet-icon">Ξ</span>
+                  <span className="wallet-name">Ethereum (ETH)</span>
+                </div>
+                <div className="wallet-address">0x18a3302C57c0F7b4C43fb4461285ffd55430AF46</div>
+              </div>
+
+              <div className="wallet-item">
+                <div className="wallet-header">
+                  <span className="wallet-icon">◎</span>
+                  <span className="wallet-name">USDT TRC-20 (TRON)</span>
+                </div>
+                <div className="wallet-address">TYyjYb2RBdMj2u21tfJhjEiPdqS4C3VAJJ</div>
+              </div>
+            </div>
+
+            <p className="done-email-note">
+              After sending, email your transaction ID to{' '}
+              <a href="mailto:scminerantminer@gmail.com">scminerantminer@gmail.com</a>
+            </p>
             <p className="done-redirect">Redirecting to your account…</p>
           </div>
         </div>
