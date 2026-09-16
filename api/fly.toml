@@ -1,5 +1,5 @@
 # fly.toml — SCMiner API on Fly.io
-app = "scminer-api"
+app = "scminer-api-v2"
 primary_region = "iad"   # Washington DC — change to nearest: lhr=London, fra=Frankfurt, sin=Singapore
 
 [build]
