@@ -3,10 +3,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
-RUN npm run build
+RUN ./node_modules/.bin/street build
 
 # ── Production stage ──────────────────────────────────────────────────────────
 FROM node:20-alpine AS runtime
